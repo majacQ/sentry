@@ -1134,6 +1134,11 @@ function buildRoutes() {
         componentPromise={() => import('sentry/views/replays/replays')}
         component={SafeLazyLoad}
       />
+      <Route
+        path=":eventSlug/"
+        componentPromise={() => import('sentry/views/replays/details')}
+        component={SafeLazyLoad}
+      />
     </Route>
   );
 
