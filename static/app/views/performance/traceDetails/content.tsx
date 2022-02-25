@@ -35,6 +35,7 @@ import {IconInfo} from 'sentry/icons';
 import {t, tct, tn} from 'sentry/locale';
 import space from 'sentry/styles/space';
 import {Organization} from 'sentry/types';
+import {defined} from 'sentry/utils';
 import {createFuzzySearch} from 'sentry/utils/createFuzzySearch';
 import DiscoverQuery from 'sentry/utils/discover/discoverQuery';
 import EventView from 'sentry/utils/discover/eventView';
@@ -91,6 +92,46 @@ class TraceDetailsContent extends React.Component<Props, State> {
     filteredTransactionIds: undefined,
   };
 
+  componentDidUpdate(prevProps: Props) {
+    if (this.props.traces !== prevProps.traces) {
+      if (defined(this.props.traces) && this.props.traces.length > 0) {
+        const transformed: IndexedFusedTransaction[] = this.props.traces.flatMap(trace =>
+          reduceTrace<IndexedFusedTransaction[]>(
+            trace,
+            (acc, transaction) => {
+              const indexed: string[] = [
+                transaction['transaction.op'],
+                transaction.transaction,
+                transaction.project_slug,
+              ];
+
+              acc.push({
+                transaction,
+                indexed,
+              });
+
+              return acc;
+            },
+            []
+          )
+        );
+
+        createFuzzySearch<IndexedFusedTransaction>(transformed, {
+          keys: ['indexed'],
+          includeMatches: true,
+          threshold: 0.6,
+          location: 0,
+          distance: 100,
+          maxPatternLength: 32,
+        }).then(fuse => {
+          this.fuse = fuse;
+        });
+      }
+    }
+  }
+
+  fuse: Fuse<IndexedFusedTransaction, Fuse.FuseOptions<IndexedFusedTransaction>> | null =
+    null;
   traceViewRef = React.createRef<HTMLDivElement>();
   virtualScrollbarContainerRef = React.createRef<HTMLDivElement>();
 
@@ -181,7 +222,7 @@ class TraceDetailsContent extends React.Component<Props, State> {
     const {traces} = this.props;
     const {filteredTransactionIds, searchQuery} = this.state;
 
-    if (!searchQuery || traces === null || traces.length <= 0) {
+    if (!searchQuery || traces === null || traces.length <= 0 || !defined(this.fuse)) {
       if (filteredTransactionIds !== undefined) {
         this.setState({
           filteredTransactionIds: undefined,
@@ -190,38 +231,8 @@ class TraceDetailsContent extends React.Component<Props, State> {
       return;
     }
 
-    const transformed = traces.flatMap(trace =>
-      reduceTrace<IndexedFusedTransaction[]>(
-        trace,
-        (acc, transaction) => {
-          const indexed: string[] = [
-            transaction['transaction.op'],
-            transaction.transaction,
-            transaction.project_slug,
-          ];
-
-          acc.push({
-            transaction,
-            indexed,
-          });
-
-          return acc;
-        },
-        []
-      )
-    );
-
-    const fuse = await createFuzzySearch(transformed, {
-      keys: ['indexed'],
-      includeMatches: true,
-      threshold: 0.6,
-      location: 0,
-      distance: 100,
-      maxPatternLength: 32,
-    });
-
-    const fuseMatches = fuse
-      .search<IndexedFusedTransaction>(searchQuery)
+    const fuseMatches = this.fuse
+      .search<IndexedFusedTransaction, true, true>(searchQuery)
       /**
        * Sometimes, there can be matches that don't include any
        * indices. These matches are often noise, so exclude them.
