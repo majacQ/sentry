@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, Sequence
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, Optional, Union, cast
 
 from rest_framework import serializers
@@ -11,6 +12,8 @@ from typing_extensions import TypedDict
 from sentry import features, roles
 from sentry.api.serializers import Serializer, register, serialize
 from sentry.api.serializers.models import UserSerializer
+from sentry.api.serializers.models.project import ProjectSerializerResponse
+from sentry.api.serializers.models.team import TeamSerializerResponse
 from sentry.app import quotas
 from sentry.auth.access import Access
 from sentry.constants import (
@@ -110,7 +113,7 @@ class OrganizationSerializerResponse(TypedDict):
     slug: str
     status: _Status
     name: str
-    dateCreated: str
+    dateCreated: datetime
     isEarlyAdopter: bool
     require2FA: bool
     requireEmailVerification: bool
@@ -222,8 +225,8 @@ class OnboardingTasksSerializerResponse(TypedDict):
     task: str  # TODO: literal/enum
     status: str  # TODO: literal/enum
     user: Optional[Union[UserSerializerResponse, UserSerializerResponseSelf]]
-    completionSeen: str
-    dateCompleted: str
+    completionSeen: datetime
+    dateCompleted: datetime
     data: Any  # JSON object
 
 
@@ -266,7 +269,7 @@ class DetailedOrganizationSerializerResponse(_DetailedOrganizationSerializerResp
     availableRoles: list[Any]  # TODO replace with enum/literal
     openMembership: bool
     allowSharedIssues: bool
-    enahncedPrivacy: bool
+    enhancedPrivacy: bool
     dataScrubber: bool
     dataScrubberDefaults: bool
     sensitiveFields: list[Any]  # TODO
@@ -279,7 +282,7 @@ class DetailedOrganizationSerializerResponse(_DetailedOrganizationSerializerResp
     scrubIPAddresses: bool
     scrapeJavaScript: bool
     allowJoinRequests: bool
-    relayPiiConfig: str
+    relayPiiConfig: Optional[str]
     apdexThreshold: int
     trustedRelays: Any  # TODO
     access: frozenset[str]
@@ -382,8 +385,7 @@ class DetailedOrganizationSerializer(OrganizationSerializer):
                 "apdexThreshold": int(
                     obj.get_option("sentry:apdex_threshold", APDEX_THRESHOLD_DEFAULT)
                 ),
-            }  # type: ignore
-            # see https://github.com/python/mypy/issues/6462
+            }
         )
 
         trusted_relays_raw = obj.get_option("sentry:trusted-relays") or []
@@ -403,8 +405,8 @@ class DetailedOrganizationSerializer(OrganizationSerializer):
 class DetailedOrganizationSerializerWithProjectsAndTeamsResponse(
     DetailedOrganizationSerializerResponse
 ):
-    teams: Any  # TODO replace with team type
-    projects: Any  # TODO replace with project type
+    teams: list[TeamSerializerResponse]
+    projects: list[ProjectSerializerResponse]
 
 
 class DetailedOrganizationSerializerWithProjectsAndTeams(DetailedOrganizationSerializer):

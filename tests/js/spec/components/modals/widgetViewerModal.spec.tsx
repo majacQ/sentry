@@ -24,7 +24,7 @@ jest.mock('echarts-for-react/lib/core', () => {
 
 const stubEl = (props: {children?: React.ReactNode}) => <div>{props.children}</div>;
 
-function mountModal({initialData, widget}) {
+function mountModal({initialData: {organization, routerContext}, widget}) {
   return mountWithTheme(
     <div style={{padding: space(4)}}>
       <WidgetViewerModal
@@ -33,10 +33,14 @@ function mountModal({initialData, widget}) {
         Body={stubEl as ModalRenderProps['Body']}
         CloseButton={stubEl}
         closeModal={() => undefined}
-        organization={initialData.organization}
+        organization={organization}
         widget={widget}
       />
-    </div>
+    </div>,
+    {
+      context: routerContext,
+      organization,
+    }
   );
 }
 
@@ -46,7 +50,9 @@ describe('Modals -> WidgetViewerModal', function () {
       features: ['discover-query', 'widget-viewer-modal'],
       apdexThreshold: 400,
     },
-    router: {},
+    router: {
+      location: {query: {}},
+    },
     project: 1,
     projects: [],
   });
@@ -123,6 +129,7 @@ describe('Modals -> WidgetViewerModal', function () {
       );
     });
   });
+
   describe('Discover TopN Chart Widget', function () {
     let container;
     const mockQuery = {
@@ -180,6 +187,71 @@ describe('Modals -> WidgetViewerModal', function () {
         },
       });
       container = mountModal({initialData, widget: mockWidget}).container;
+    });
+
+    it('renders Discover topn chart widget viewer', function () {
+      expect(container).toSnapshot();
+    });
+  });
+
+  describe('Discover World Map Chart Widget', function () {
+    let container, eventsMock;
+    const mockQuery = {
+      conditions: 'title:/organizations/:orgId/performance/summary/',
+      fields: ['p75(measurements.lcp)'],
+      id: '1',
+      name: 'Query Name',
+      orderby: '',
+    };
+    const mockWidget = {
+      title: 'Test Widget',
+      displayType: DisplayType.WORLD_MAP,
+      interval: '5m',
+      queries: [mockQuery],
+    };
+
+    beforeEach(function () {
+      const eventsBody = {
+        data: [
+          {
+            'geo.country_code': 'ES',
+            p75_measurements_lcp: 2000,
+          },
+          {
+            'geo.country_code': 'SK',
+            p75_measurements_lcp: 3000,
+          },
+          {
+            'geo.country_code': 'CO',
+            p75_measurements_lcp: 4000,
+          },
+        ],
+        meta: {
+          'geo.country_code': 'string',
+          p75_measurements_lcp: 'duration',
+        },
+      };
+      eventsMock = MockApiClient.addMockResponse({
+        url: '/organizations/org-slug/eventsv2/',
+        body: eventsBody,
+      });
+      MockApiClient.addMockResponse({
+        url: '/organizations/org-slug/events-geo/',
+        body: eventsBody,
+      });
+      container = mountModal({initialData, widget: mockWidget}).container;
+    });
+
+    it('always queries geo.country_code in the table chart', async function () {
+      expect(eventsMock).toHaveBeenCalledWith(
+        '/organizations/org-slug/eventsv2/',
+        expect.objectContaining({
+          query: expect.objectContaining({
+            field: ['geo.country_code', 'p75(measurements.lcp)'],
+          }),
+        })
+      );
+      expect(await screen.findByText('geo.country_code')).toBeInTheDocument();
     });
 
     it('renders Discover topn chart widget viewer', function () {

@@ -1,17 +1,17 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import styled from '@emotion/styled';
 
-import {FlamegraphOptionsMenu} from 'sentry/components/profiling/FlamegraphOptionsMenu';
-import {FlamegraphSearch} from 'sentry/components/profiling/FlamegraphSearch';
-import {FlamegraphToolbar} from 'sentry/components/profiling/FlamegraphToolbar';
-import {FlamegraphViewSelectMenu} from 'sentry/components/profiling/FlamegraphViewSelectMenu';
-import {FlamegraphZoomView} from 'sentry/components/profiling/FlamegraphZoomView';
-import {FlamegraphZoomViewMinimap} from 'sentry/components/profiling/FlamegraphZoomViewMinimap';
-import {ProfileDragDropImport} from 'sentry/components/profiling/ProfileDragDropImport';
-import {ThreadMenuSelector} from 'sentry/components/profiling/ThreadSelector';
+import {FlamegraphOptionsMenu} from 'sentry/components/profiling/flamegraphOptionsMenu';
+import {FlamegraphSearch} from 'sentry/components/profiling/flamegraphSearch';
+import {FlamegraphToolbar} from 'sentry/components/profiling/flamegraphToolbar';
+import {FlamegraphViewSelectMenu} from 'sentry/components/profiling/flamegraphViewSelectMenu';
+import {FlamegraphZoomView} from 'sentry/components/profiling/flamegraphZoomView';
+import {FlamegraphZoomViewMinimap} from 'sentry/components/profiling/flamegraphZoomViewMinimap';
+import {ProfileDragDropImport} from 'sentry/components/profiling/profileDragDropImport';
+import {ThreadMenuSelector} from 'sentry/components/profiling/threadSelector';
 import {CanvasPoolManager} from 'sentry/utils/profiling/canvasScheduler';
 import {Flamegraph as FlamegraphModel} from 'sentry/utils/profiling/flamegraph';
-import {FlamegraphTheme} from 'sentry/utils/profiling/flamegraph/FlamegraphTheme';
+import {FlamegraphTheme} from 'sentry/utils/profiling/flamegraph/flamegraphTheme';
 import {useFlamegraphPreferences} from 'sentry/utils/profiling/flamegraph/useFlamegraphPreferences';
 import {useFlamegraphTheme} from 'sentry/utils/profiling/flamegraph/useFlamegraphTheme';
 import {ProfileGroup} from 'sentry/utils/profiling/profile/importProfile';
@@ -22,26 +22,30 @@ interface FlamegraphProps {
 
 function Flamegraph(props: FlamegraphProps): React.ReactElement {
   const flamegraphTheme = useFlamegraphTheme();
+  const [{sorting, view}, dispatch] = useFlamegraphPreferences();
   const canvasPoolManager = useMemo(() => new CanvasPoolManager(), []);
-  const [{sorting, view, colorCoding}, dispatch] = useFlamegraphPreferences();
 
   const [flamegraph, setFlamegraph] = useState(
     new FlamegraphModel(
       props.profiles.profiles[props.profiles.activeProfileIndex],
-      0,
-      view === 'bottom up',
-      sorting === 'left heavy'
+      props.profiles.activeProfileIndex,
+      {
+        inverted: view === 'bottom up',
+        leftHeavy: sorting === 'left heavy',
+      }
     )
   );
 
   const onImport = useCallback(
-    profile => {
+    (profile: ProfileGroup) => {
       setFlamegraph(
         new FlamegraphModel(
-          profile.profiles[0],
-          0,
-          view === 'bottom up',
-          sorting === 'left heavy'
+          profile.profiles[profile.activeProfileIndex],
+          profile.activeProfileIndex,
+          {
+            inverted: view === 'bottom up',
+            leftHeavy: sorting === 'left heavy',
+          }
         )
       );
     },
@@ -49,14 +53,12 @@ function Flamegraph(props: FlamegraphProps): React.ReactElement {
   );
 
   const onProfileIndexChange = useCallback(
-    index => {
+    (index: number) => {
       setFlamegraph(
-        new FlamegraphModel(
-          props.profiles.profiles[index],
-          index,
-          view === 'bottom up',
-          sorting === 'left heavy'
-        )
+        new FlamegraphModel(props.profiles.profiles[index], index, {
+          inverted: view === 'bottom up',
+          leftHeavy: sorting === 'left heavy',
+        })
       );
     },
     [props.profiles, view, sorting]
@@ -65,10 +67,12 @@ function Flamegraph(props: FlamegraphProps): React.ReactElement {
   useEffect(() => {
     setFlamegraph(
       new FlamegraphModel(
-        props.profiles.profiles[0],
-        0,
-        view === 'bottom up',
-        sorting === 'left heavy'
+        props.profiles.profiles[flamegraph.profileIndex],
+        flamegraph.profileIndex,
+        {
+          inverted: view === 'bottom up',
+          leftHeavy: sorting === 'left heavy',
+        }
       )
     );
   }, [props.profiles, view, sorting]);
@@ -91,17 +95,12 @@ function Flamegraph(props: FlamegraphProps): React.ReactElement {
           activeProfileIndex={flamegraph.profileIndex}
           onProfileIndexChange={onProfileIndexChange}
         />
-        <FlamegraphOptionsMenu
-          colorCoding={colorCoding}
-          onColorCodingChange={c => dispatch({type: 'set color coding', value: c})}
-          canvasPoolManager={canvasPoolManager}
-        />
+        <FlamegraphOptionsMenu canvasPoolManager={canvasPoolManager} />
       </FlamegraphToolbar>
 
       <FlamegraphZoomViewMinimapContainer height={flamegraphTheme.SIZES.MINIMAP_HEIGHT}>
         <FlamegraphZoomViewMinimap
           flamegraph={flamegraph}
-          colorCoding={colorCoding}
           canvasPoolManager={canvasPoolManager}
         />
       </FlamegraphZoomViewMinimapContainer>
@@ -109,7 +108,6 @@ function Flamegraph(props: FlamegraphProps): React.ReactElement {
         <ProfileDragDropImport onImport={onImport}>
           <FlamegraphZoomView
             flamegraph={flamegraph}
-            colorCoding={colorCoding}
             canvasPoolManager={canvasPoolManager}
           />
           <FlamegraphSearch
@@ -127,7 +125,8 @@ const FlamegraphZoomViewMinimapContainer = styled('div')<{
   height: FlamegraphTheme['SIZES']['MINIMAP_HEIGHT'];
 }>`
   position: relative;
-  height: ${p => p.height};
+  height: ${p => p.height}px;
+  flex-shrink: 0;
 `;
 
 const FlamegraphZoomViewContainer = styled('div')`

@@ -18,6 +18,7 @@ import {IconQuestion} from 'sentry/icons';
 import {t, tct} from 'sentry/locale';
 import space from 'sentry/styles/space';
 import {Environment, Organization, SelectValue} from 'sentry/types';
+import {MobileVital, WebVital} from 'sentry/utils/discover/fields';
 import {getDisplayName} from 'sentry/utils/environment';
 import theme from 'sentry/utils/theme';
 import {
@@ -326,6 +327,16 @@ class RuleConditionsForm extends React.PureComponent<Props, State> {
       });
     }
 
+    const transactionTags = [
+      'transaction',
+      'transaction.duration',
+      'transaction.op',
+      'transaction.status',
+    ];
+    const measurementTags = Object.values({...WebVital, ...MobileVital});
+    const eventOmitTags =
+      dataset === 'events' ? [...measurementTags, ...transactionTags] : [];
+
     const formElemBaseStyle = {
       padding: `${space(0.5)}`,
       border: 'none',
@@ -436,6 +447,7 @@ class RuleConditionsForm extends React.PureComponent<Props, State> {
                     'release.package',
                     'release.build',
                     'project',
+                    ...eventOmitTags,
                   ]}
                   includeSessionTagsValues={dataset === Dataset.SESSIONS}
                   disabled={disabled}
