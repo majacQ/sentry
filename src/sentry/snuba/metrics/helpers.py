@@ -220,27 +220,21 @@ class QueryDefinition:
         return (op, metric_name), direction
 
     def _parse_limit(self, query_params, paginator_kwargs):
-        limit = paginator_kwargs.get("limit")
-        if not self.orderby:
+        if self.orderby:
+            return paginator_kwargs.get("limit")
+        else:
             per_page = query_params.get("per_page")
             if per_page is not None:
                 # If order by is not None, it means we will have a `series` query which cannot be
                 # paginated, and passing a `per_page` url param to paginate the results is not
                 # possible
                 raise InvalidParams("'per_page' is only supported in combination with 'orderBy'")
-
-        if limit is not None:
-            try:
-                limit = int(limit)
-                if limit < 1:
-                    raise ValueError
-            except (ValueError, TypeError):
-                raise InvalidParams("'limit' must be integer >= 1")
-
-        return limit
+            return None
 
     def _parse_offset(self, query_params, paginator_kwargs):
-        if not self.orderby:
+        if self.orderby:
+            return paginator_kwargs.get("offset")
+        else:
             cursor = query_params.get("cursor")
             if cursor is not None:
                 # If order by is not None, it means we will have a `series` query which cannot be
@@ -248,7 +242,6 @@ class QueryDefinition:
                 # possible
                 raise InvalidParams("'cursor' is only supported in combination with 'orderBy'")
             return None
-        return paginator_kwargs.get("offset")
 
 
 class TimeRange(Protocol):
@@ -375,38 +368,6 @@ AVAILABLE_OPERATIONS = {
 OPERATIONS_TO_ENTITY = {
     op: entity for entity, operations in AVAILABLE_OPERATIONS.items() for op in operations
 }
-
-_BASE_TAGS = {
-    "environment": [
-        "production",
-        "staging",
-    ],
-    "release": [],
-}
-
-_SESSION_TAGS = dict(
-    _BASE_TAGS,
-    **{
-        "session.status": [
-            "abnormal",
-            "crashed",
-            "errored",
-            "healthy",
-        ],
-    },
-)
-
-_TRANSACTION_TAGS = dict(
-    _BASE_TAGS,
-    transaction=["/foo/:orgId/", "/bar/:orgId/"],
-)
-
-_MEASUREMENT_TAGS = dict(
-    _TRANSACTION_TAGS,
-    measurement_rating=["good", "meh", "poor"],
-)
-
-
 ALLOWED_GROUPBY_COLUMNS = ("project_id",)
 
 
@@ -499,12 +460,15 @@ class SnubaQueryBuilder:
             orderby=self._build_orderby(query_definition, entity),
         )
 
-        if totals_query.orderby is None:
-            series_query = totals_query.set_groupby(
-                (totals_query.groupby or []) + [Column(TS_COL_GROUP)]
-            )
-        else:
-            series_query = None
+        series_query = totals_query.set_groupby(
+            (totals_query.groupby or []) + [Column(TS_COL_GROUP)]
+        )
+
+        # In a series query, we also need to factor in the len of the intervals array
+        series_limit = MAX_POINTS
+        if query_definition.limit:
+            series_limit = query_definition.limit * len(list(get_intervals(query_definition)))
+        series_query = series_query.set_limit(series_limit)
 
         return {
             "totals": totals_query,

@@ -1,7 +1,7 @@
 import isEqual from 'lodash/isEqual';
 
 import {RELEASE_ADOPTION_STAGES} from 'sentry/constants';
-import {Organization, SelectValue} from 'sentry/types';
+import {MetricsColumnType, Organization, SelectValue} from 'sentry/types';
 import {assert} from 'sentry/types/utils';
 
 import {METRIC_TO_COLUMN_TYPE} from '../metrics/fields';
@@ -36,7 +36,10 @@ export type ParsedFunction = {
 
 type ValidateColumnValueFunction = ({name: string, dataType: ColumnType}) => boolean;
 
-export type ValidateColumnTypes = ColumnType[] | ValidateColumnValueFunction;
+export type ValidateColumnTypes =
+  | ColumnType[]
+  | MetricsColumnType[]
+  | ValidateColumnValueFunction;
 
 export type AggregateParameter =
   | {
@@ -136,12 +139,12 @@ export const AGGREGATIONS = {
     multiPlotType: 'line',
   },
   count_miserable: {
-    getFieldOverrides({parameter, organization}: DefaultValueInputs) {
+    getFieldOverrides({parameter}: DefaultValueInputs) {
       if (parameter.kind === 'column') {
         return {defaultValue: 'user'};
       }
       return {
-        defaultValue: organization.apdexThreshold?.toString() ?? parameter.defaultValue,
+        defaultValue: parameter.defaultValue,
       };
     },
     parameters: [
@@ -371,11 +374,6 @@ export const AGGREGATIONS = {
     multiPlotType: 'line',
   },
   apdex: {
-    getFieldOverrides({parameter, organization}: DefaultValueInputs) {
-      return {
-        defaultValue: organization.apdexThreshold?.toString() ?? parameter.defaultValue,
-      };
-    },
     parameters: [
       {
         kind: 'value',
@@ -389,11 +387,6 @@ export const AGGREGATIONS = {
     multiPlotType: 'line',
   },
   user_misery: {
-    getFieldOverrides({parameter, organization}: DefaultValueInputs) {
-      return {
-        defaultValue: organization.apdexThreshold?.toString() ?? parameter.defaultValue,
-      };
-    },
     parameters: [
       {
         kind: 'value',
@@ -437,7 +430,6 @@ export type AggregationOutputType = Extract<
 export type PlotType = 'bar' | 'line' | 'area';
 
 type DefaultValueInputs = {
-  organization: Organization;
   parameter: AggregateParameter;
 };
 

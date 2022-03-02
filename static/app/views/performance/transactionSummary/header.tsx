@@ -123,6 +123,7 @@ class TransactionHeader extends React.Component<Props> {
         onIncompatibleQuery={this.handleIncompatibleQuery}
         onSuccess={this.handleCreateAlertSuccess}
         referrer="performance"
+        aria-label={t('Create Alert')}
       />
     );
   }
@@ -246,7 +247,7 @@ class TransactionHeader extends React.Component<Props> {
     const anomaliesTarget = anomaliesRouteWithQuery(routeQuery);
 
     return (
-      <Layout.Header data-test-id="transaction-header">
+      <Layout.Header>
         <Layout.HeaderContent>
           <Breadcrumb
             organization={organization}
@@ -277,7 +278,13 @@ class TransactionHeader extends React.Component<Props> {
             >
               {t('Overview')}
             </ListLink>
-            {this.renderWebVitalsTab()}
+            <ListLink
+              to={eventsTarget}
+              isActive={() => currentTab === Tab.Events}
+              onClick={this.trackTabClick(Tab.Events)}
+            >
+              {t('All Events')}
+            </ListLink>
             <ListLink
               to={tagsTarget}
               isActive={() => currentTab === Tab.Tags}
@@ -285,15 +292,6 @@ class TransactionHeader extends React.Component<Props> {
             >
               {t('Tags')}
             </ListLink>
-            <Feature features={['organizations:performance-events-page']}>
-              <ListLink
-                to={eventsTarget}
-                isActive={() => currentTab === Tab.Events}
-                onClick={this.trackTabClick(Tab.Events)}
-              >
-                {t('All Events')}
-              </ListLink>
-            </Feature>
             <Feature
               organization={organization}
               features={['organizations:performance-suspect-spans-view']}
@@ -322,6 +320,7 @@ class TransactionHeader extends React.Component<Props> {
                 <FeatureBadge type="alpha" noTooltip />
               </ListLink>
             </Feature>
+            {this.renderWebVitalsTab()}
           </StyledNavTabs>
         </React.Fragment>
       </Layout.Header>
