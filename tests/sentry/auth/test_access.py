@@ -372,7 +372,7 @@ class FromSentryAppTest(TestCase):
         result = access.from_request(request, self.org)
         assert result.has_global_access
         assert result.has_team_access(self.team)
-        assert result.teams == frozenset({self.team})
+        assert result.teams == frozenset()
         assert result.scopes == frozenset()
         assert result.has_project_access(self.project)
         assert not result.has_project_access(self.out_of_scope_project)
@@ -415,11 +415,6 @@ class FromSentryAppTest(TestCase):
         assert result.has_project_access(deleted_project) is False
         assert result.has_project_membership(deleted_project) is False
 
-        # result.projects also contains other projects created by
-        # self.create_sentry_app_installation
-        assert deleted_project not in result.projects
-        assert self.project in result.projects
-
     def test_no_deleted_teams(self):
         deleted_team = self.create_team(organization=self.org, status=TeamStatus.PENDING_DELETION)
         self.create_member(
@@ -428,7 +423,6 @@ class FromSentryAppTest(TestCase):
         request = self.make_request(user=self.proxy_user)
         result = access.from_request(request, self.org)
         assert result.has_team_access(deleted_team) is False
-        assert result.teams == frozenset({self.team})
 
     def test_has_app_scopes(self):
         app_with_scopes = self.create_sentry_app(name="ScopeyTheApp", organization=self.org)
