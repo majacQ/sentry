@@ -15,15 +15,16 @@ class TaggedEventForm(forms.Form):  # type: ignore
     match = forms.ChoiceField(choices=list(MATCH_CHOICES.items()), widget=forms.Select())
     value = forms.CharField(widget=forms.TextInput(), required=False)
 
-    def clean(self) -> dict[str, Any]:
-        super().clean()
+    def clean(self) -> dict[str, Any] | None:
+        cleaned_data: dict[str, Any] = super().clean()
 
-        match = self.cleaned_data.get("match")
-        value = self.cleaned_data.get("value")
+        match = cleaned_data.get("match")
+        value = cleaned_data.get("value")
 
         if match not in (MatchType.IS_SET, MatchType.NOT_SET) and not value:
             raise forms.ValidationError("This field is required.")
-        return {}
+
+        return None
 
 
 class TaggedEventCondition(EventCondition):
