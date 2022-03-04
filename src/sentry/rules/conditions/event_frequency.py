@@ -233,7 +233,11 @@ class EventFrequencyPercentForm(EventFrequencyForm):
 
     def clean(self) -> dict[str, Any] | None:
         cleaned_data = super().clean()
-        if cleaned_data["comparisonType"] == COMPARISON_TYPE_COUNT and cleaned_data["value"] > 100:
+        if (
+            cleaned_data
+            and cleaned_data["comparisonType"] == COMPARISON_TYPE_COUNT
+            and cleaned_data["value"] > 100
+        ):
             self.add_error(
                 "value", forms.ValidationError("Ensure this value is less than or equal to 100")
             )
