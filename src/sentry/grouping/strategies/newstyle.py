@@ -378,7 +378,7 @@ def frame(
 
             values.append(package_component)
 
-    rv = GroupingComponent(id="frame", values=values)
+    rv = GroupingComponent(id="frame", defaults=values)
 
     # if we are in javascript fuzzing mode we want to disregard some
     # frames consistently.  These force common bad stacktraces together
@@ -671,7 +671,7 @@ def single_exception(
 
             values.append(value_component)
 
-        rv[variant] = GroupingComponent(id="exception", values=values)
+        rv[variant] = GroupingComponent(id="exception", defaults=values)
 
     return rv
 

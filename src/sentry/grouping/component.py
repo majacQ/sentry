@@ -65,7 +65,7 @@ class GroupingComponent:
             hint=hint,
             contributes=contributes,
             contributes_to_similarity=contributes_to_similarity,
-            values=values,
+            defaults=values,
             tree_label=tree_label,
             is_prefix_frame=is_prefix_frame,
             is_sentinel_frame=is_sentinel_frame,
@@ -210,4 +210,4 @@ class GroupingComponent:
         return rv
 
     def __repr__(self):
-        return f"GroupingComponent({self.id!r}, hint={self.hint!r}, contributes={self.contributes!r}, values={self.values!r})"
+        return f"GroupingComponent({self.id!r}, hint={self.hint!r}, contributes={self.contributes!r}, defaults={self.values!r})"

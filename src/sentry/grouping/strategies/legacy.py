@@ -238,7 +238,7 @@ def chained_exception_legacy(
             if stacktrace_component is None or not stacktrace_component.contributes:
                 value.update(contributes=False, hint="exception has no stacktrace")
 
-    return {context["variant"]: GroupingComponent(id="chained-exception", values=values)}
+    return {context["variant"]: GroupingComponent(id="chained-exception", defaults=values)}
 
 
 @chained_exception_legacy.variant_processor
