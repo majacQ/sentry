@@ -1175,7 +1175,7 @@ class DerivedMetricsDataTest(SessionMetricsTestCase, APITestCase):
         {
             **ORIGINAL_DERIVED_METRICS,
             "crash_free_fake": SingularEntityDerivedMetric(
-                name="crash_free_fake",
+                metric_name="crash_free_fake",
                 metrics=["crashed_sessions", "sessions_errored_set"],
                 unit="percentage",
                 snql=lambda *args, entity, metric_ids, alias=None: _percentage_in_snql(
