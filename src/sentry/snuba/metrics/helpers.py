@@ -427,18 +427,15 @@ class SnubaQueryBuilder:
         if query_definition.orderby is None:
             return None
         (op, metric_name), direction = query_definition.orderby
-        # ToDo move entity to class def
-        field_snql_builder = _metrics_field_snql_builder_factory(op, metric_name)
-        return [
-            OrderBy(
-                field_snql_builder._build_conditional_aggregate_for_metric(entity=entity),
-                direction,
-            )
-        ]
+        metric_field_obj = metric_object_factory(op, metric_name)
+        return metric_field_obj.generate_orderby_clause(
+            entity=entity, projects=self._projects, direction=direction
+        )
 
     @staticmethod
     def _build_totals_and_series_queries(
-            entity, select, where, groupby, orderby, limit, offset, rollup, intervals_len):
+        entity, select, where, groupby, orderby, limit, offset, rollup, intervals_len
+    ):
         totals_query = Query(
             dataset=Dataset.Metrics.value,
             match=Entity(entity),
@@ -467,7 +464,7 @@ class SnubaQueryBuilder:
 
         queries_by_entity = OrderedDict()
         for op, metric_name in query_definition.fields.values():
-            metric_field_obj = _metrics_field_snql_builder_factory(op, metric_name)
+            metric_field_obj = metric_object_factory(op, metric_name)
             entity = metric_field_obj.get_entity(projects=self._projects)
 
             # If entity is returned as None, it means we ran into an instance of
@@ -513,7 +510,7 @@ class SnubaQueryBuilder:
                 limit=query_definition.limit,
                 offset=query_definition.offset,
                 rollup=query_definition.rollup,
-                intervals_len=len(list(get_intervals(query_definition)))
+                intervals_len=len(list(get_intervals(query_definition))),
             )
 
         return queries_dict
@@ -993,7 +990,7 @@ class CompositeEntityTraverser(DerivedMetricBaseTraverser):
         return True
 
 
-def _metrics_field_snql_builder_factory(op, metric_name):
+def metric_object_factory(op, metric_name):
     if metric_name in DERIVED_METRICS:
         instance = DERIVED_METRICS[metric_name]
     else:
@@ -1015,17 +1012,8 @@ class MetricsFieldBase(ABC):
     def generate_select_statements(self, **kwargs):
         raise NotImplementedError
 
-    def _build_conditional_aggregate_for_metric(self, entity):
-        # ToDo alias needs to be changed
-        snuba_function = _OP_TO_SNUBA_FUNCTION[entity][self.op]
-        return Function(
-            snuba_function,
-            [
-                Column("value"),
-                Function("equals", [Column("metric_id"), resolve_weak(self.metric_name)]),
-            ],
-            alias=f"{self.op}({self.metric_name})",
-        )
+    def generate_orderby_clause(self, **kwargs):
+        raise NotImplementedError
 
 
 class RawMetric(MetricsFieldBase):
@@ -1037,8 +1025,27 @@ class RawMetric(MetricsFieldBase):
             {resolve_weak(self.metric_name)} if OPERATIONS_TO_ENTITY[self.op] == entity else set()
         )
 
+    def _build_conditional_aggregate_for_metric(self, entity):
+        snuba_function = _OP_TO_SNUBA_FUNCTION[entity][self.op]
+        return Function(
+            snuba_function,
+            [
+                Column("value"),
+                Function("equals", [Column("metric_id"), resolve_weak(self.metric_name)]),
+            ],
+            alias=f"{self.op}({self.metric_name})",
+        )
+
     def generate_select_statements(self, entity, **kwargs):
         return [self._build_conditional_aggregate_for_metric(entity=entity)]
+
+    def generate_orderby_clause(self, entity, direction, **kwargs):
+        return [
+            OrderBy(
+                self.generate_select_statements(entity=entity)[0],
+                direction,
+            )
+        ]
 
     entity = cached_property(get_entity)
 
@@ -1089,6 +1096,14 @@ class DerivedMetric(MetricsFieldBase, ABC):
         return self.traverser_cls.generate_bottom_up_derived_metrics_dependencies(
             derived_metric_name=self.metric_name
         )
+
+    def generate_orderby_clause(self, projects, direction):
+        return [
+            OrderBy(
+                self.generate_select_statements(projects=projects)[0],
+                direction,
+            )
+        ]
 
     entity = cached_property(get_entity)
 
