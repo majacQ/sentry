@@ -1334,10 +1334,10 @@
   resolved "https://registry.yarnpkg.com/@emmetio/scanner/-/scanner-1.0.0.tgz#065b2af6233fe7474d44823e3deb89724af42b5f"
   integrity sha512-8HqW8EVqjnCmWXVpqAOZf+EGESdkR27odcMMMGefgKXtar00SoYNSryGv//TELI4T3QFsECo78p+0lmalk/CFA==
 
-"@emotion/babel-plugin@^11.0.0", "@emotion/babel-plugin@^11.3.0":
-  version "11.3.0"
-  resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.3.0.tgz#3a16850ba04d8d9651f07f3fb674b3436a4fb9d7"
-  integrity sha512-UZKwBV2rADuhRp+ZOGgNWg2eYgbzKzQXfQPtJbu/PLy8onurxlNCLvxMQEvlr1/GudguPI5IU9qIY1+2z1M5bA==
+"@emotion/babel-plugin@^11.0.0", "@emotion/babel-plugin@^11.3.0", "@emotion/babel-plugin@^11.7.2":
+  version "11.7.2"
+  resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.7.2.tgz#fec75f38a6ab5b304b0601c74e2a5e77c95e5fa0"
+  integrity sha512-6mGSCWi9UzXut/ZAN6lGFu33wGR3SJisNl3c0tvlmb8XChH1b2SUvxvnOh7hvLpqyRdHHU9AiazV3Cwbk5SXKQ==
   dependencies:
     "@babel/helper-module-imports" "^7.12.13"
     "@babel/plugin-syntax-jsx" "^7.12.13"
@@ -1350,7 +1350,7 @@
     escape-string-regexp "^4.0.0"
     find-root "^1.1.0"
     source-map "^0.5.7"
-    stylis "^4.0.3"
+    stylis "4.0.13"
 
 "@emotion/cache@^10.0.27", "@emotion/cache@^10.0.9":
   version "10.0.29"
@@ -4199,10 +4199,10 @@
     jest-matcher-utils "^27.0.0"
     pretty-format "^27.0.0"
 
-"@types/js-cookie@^2.2.7":
-  version "2.2.7"
-  resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-2.2.7.tgz#226a9e31680835a6188e887f3988e60c04d3f6a3"
-  integrity sha512-aLkWa0C0vO5b4Sr798E26QgOkss68Un0bLjs7u9qxzPT5CG+8DuNTffWES58YzJs3hrVAOs1wonycqEBqNJubA==
+"@types/js-cookie@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@types/js-cookie/-/js-cookie-3.0.1.tgz#04aa743e2e0a85a22ee9aa61f6591a8bc19b5d68"
+  integrity sha512-7wg/8gfHltklehP+oyJnZrz9XBuX5ZPP4zB6UsI84utdlkRYLnOm2HfpLXazTwZA+fpGn0ir8tGNgVnMEleBGQ==
 
 "@types/json-schema@*", "@types/json-schema@^7.0.3", "@types/json-schema@^7.0.4", "@types/json-schema@^7.0.5", "@types/json-schema@^7.0.8", "@types/json-schema@^7.0.9":
   version "7.0.9"
@@ -4302,10 +4302,10 @@
   resolved "https://registry.yarnpkg.com/@types/overlayscrollbars/-/overlayscrollbars-1.12.0.tgz#98456caceca8ad73bd5bb572632a585074e70764"
   integrity sha512-h/pScHNKi4mb+TrJGDon8Yb06ujFG0mSg12wIO0sWMUF3dQIe2ExRRdNRviaNt9IjxIiOfnRr7FsQAdHwK4sMg==
 
-"@types/papaparse@^5.2.6":
-  version "5.2.6"
-  resolved "https://registry.yarnpkg.com/@types/papaparse/-/papaparse-5.2.6.tgz#0bba18de4d15eff65883bc7c0794e0134de9e7c7"
-  integrity sha512-xGKSd0UTn58N1h0+zf8mW863Rv8BvXcGibEgKFtBIXZlcDXAmX/T4RdDO2mwmrmOypUDt5vRgo2v32a78JdqUA==
+"@types/papaparse@^5.3.2":
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/@types/papaparse/-/papaparse-5.3.2.tgz#6ccace6eac8ddb03a6fd06883b84dd6c6561f69f"
+  integrity sha512-BNbCHJkTE4RwmAFkCxEalET4mDvGr/1ld7ZtQ4i/laWI/iiVt+GL07stdvufle4KfywyvloqqpIiJscXNCrKxA==
   dependencies:
     "@types/node" "*"
 
@@ -6765,6 +6765,20 @@ css-loader@^3.6.0, css-loader@^5.0.1, css-loader@^5.2.6:
     postcss-modules-values "^4.0.0"
     postcss-value-parser "^4.1.0"
     schema-utils "^3.0.0"
+    semver "^7.3.5"
+
+css-loader@^6.7.0:
+  version "6.7.0"
+  resolved "https://registry.yarnpkg.com/css-loader/-/css-loader-6.7.0.tgz#c1200da1dfffe6643b18bda20fdd84cad3e36d39"
+  integrity sha512-S7HCfCiDHLA+VXKqdZwyRZgoO0R9BnKDnVIoHMq5grl3N86zAu7MB+FBWHr5xOJC8SmvpTLha/2NpfFkFEN/ig==
+  dependencies:
+    icss-utils "^5.1.0"
+    postcss "^8.4.7"
+    postcss-modules-extract-imports "^3.0.0"
+    postcss-modules-local-by-default "^4.0.0"
+    postcss-modules-scope "^3.0.0"
+    postcss-modules-values "^4.0.0"
+    postcss-value-parser "^4.2.0"
     semver "^7.3.5"
 
 css-minimizer-webpack-plugin@^3.4.1:
@@ -11499,10 +11513,15 @@ nanocolors@^0.1.1:
   resolved "https://registry.yarnpkg.com/nanocolors/-/nanocolors-0.1.12.tgz#8577482c58cbd7b5bb1681db4cf48f11a87fd5f6"
   integrity sha512-2nMHqg1x5PU+unxX7PGY7AuYxl2qDx7PSrTRjizr8sxdd3l/3hBuWWaki62qmtYm2U5i4Z5E7GbjlyDFhs9/EQ==
 
-nanoid@^3.1.28, nanoid@^3.2.0:
+nanoid@^3.1.28:
   version "3.2.0"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.2.0.tgz#62667522da6673971cca916a6d3eff3f415ff80c"
   integrity sha512-fmsZYa9lpn69Ad5eDn7FMcnnSR+8R34W9qJEijxYhTbfOWzr22n1QxCMzXLK+ODyW2973V3Fux959iQoUxzUIA==
+
+nanoid@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.1.tgz#6347a18cac88af88f58af0b3594b723d5e99bb35"
+  integrity sha512-n6Vs/3KGyxPQd6uO0eH4Bv0ojGSUvuLlIHtC3Y0kEO23YRge8H9x1GCzLn28YX0H66pMkxuaeESFq4tKISKwdw==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -12660,12 +12679,12 @@ postcss@^7.0.26, postcss@^7.0.32, postcss@^7.0.36:
     source-map "^0.6.1"
     supports-color "^6.1.0"
 
-postcss@^8.2.1, postcss@^8.2.15, postcss@^8.3.5, postcss@^8.4.5:
-  version "8.4.6"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.6.tgz#c5ff3c3c457a23864f32cb45ac9b741498a09ae1"
-  integrity sha512-OovjwIzs9Te46vlEx7+uXB0PLijpwjXGKXjVGGPIGubGpq7uh5Xgf6D6FiJ/SzJMBosHDp6a2hiXOS97iBXcaA==
+postcss@^8.2.1, postcss@^8.2.15, postcss@^8.3.5, postcss@^8.4.5, postcss@^8.4.7:
+  version "8.4.8"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.8.tgz#dad963a76e82c081a0657d3a2f3602ce10c2e032"
+  integrity sha512-2tXEqGxrjvAO6U+CJzDL2Fk2kPHTv1jQsYkSoMeOis2SsYaXRO2COxTdQp99cYvif9JTXaAk9lYGc3VhJt7JPQ==
   dependencies:
-    nanoid "^3.2.0"
+    nanoid "^3.3.1"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
@@ -14534,10 +14553,10 @@ storybook-addon-outline@^1.4.1:
     "@storybook/core-events" "^6.3.0"
     ts-dedent "^2.1.1"
 
-storybook-dark-mode@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/storybook-dark-mode/-/storybook-dark-mode-1.0.8.tgz#bbd64b382fd62d38685fdd769e2cac4e32ec293d"
-  integrity sha512-uY6yTSd1vYE0YwlON50u+iIoNF/fmMj59ww1cpd/naUcmOmCjwawViKFG5YjichwdR/yJ5ybWRUF0tnRQfaSiw==
+storybook-dark-mode@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/storybook-dark-mode/-/storybook-dark-mode-1.0.9.tgz#40c15aa340bc700df2fb4f1345250e6fdace0b3a"
+  integrity sha512-ITPXM2OSaga1zM5blpZy5HxMWAhrAqYi9aJtLgRtSdgoRrxVNAInDRD14TjmObdgLHNWxINoNbnEB+sKETa+iw==
   dependencies:
     fast-deep-equal "^3.0.0"
     memoizerific "^1.11.3"
@@ -14735,10 +14754,10 @@ style-loader@^1.3.0, style-loader@^2.0.0:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
-style-loader@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-3.0.0.tgz#2eafcd0dbe70b07438e0256a9714ea94dd63cbe0"
-  integrity sha512-pqJTDiCtLr8D2eyVWXPiwNkLsAMDuvPHnu+Z/Edo9hu+DzdJwdO5eZv9zUBF6tWI8GJGhAkenWJaVjXI+sHnuQ==
+style-loader@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/style-loader/-/style-loader-3.3.1.tgz#057dfa6b3d4d7c7064462830f9113ed417d38575"
+  integrity sha512-GPcQ+LDJbrcxHORTRes6Jy2sfvK2kS6hpSfI/fXhPt+spVzxF6LJ1dHLN9zIGmVaaP044YKaIatFaufENRiDoQ==
 
 style-search@^0.1.0:
   version "0.1.0"
@@ -14824,10 +14843,10 @@ stylelint@14.3.0:
     v8-compile-cache "^2.3.0"
     write-file-atomic "^4.0.0"
 
-stylis@^4.0.3:
-  version "4.0.10"
-  resolved "https://registry.yarnpkg.com/stylis/-/stylis-4.0.10.tgz#446512d1097197ab3f02fb3c258358c3f7a14240"
-  integrity sha512-m3k+dk7QeJw660eIKRRn3xPF6uuvHs/FFzjX3HQ5ove0qYsiygoAhwn5a3IYKaZPo5LrYD0rfVmtv1gNY1uYwg==
+stylis@4.0.13, stylis@^4.0.3:
+  version "4.0.13"
+  resolved "https://registry.yarnpkg.com/stylis/-/stylis-4.0.13.tgz#f5db332e376d13cc84ecfe5dace9a2a51d954c91"
+  integrity sha512-xGPXiFVl4YED9Jh7Euv2V220mriG9u4B2TA6Ybjc1catrstKD2PpIdU3U0RKpkVBC2EhmL/F0sPCr9vrFTNRag==
 
 substyle@^9.1.0:
   version "9.2.0"
@@ -15123,10 +15142,10 @@ to-regex@^3.0.1, to-regex@^3.0.2:
     regex-not "^1.0.2"
     safe-regex "^1.1.0"
 
-tocbot@^4.13.4:
-  version "4.13.4"
-  resolved "https://registry.yarnpkg.com/tocbot/-/tocbot-4.13.4.tgz#deae6f75de8c0ffdc887c4f2e3f00d52dfb81def"
-  integrity sha512-YIiqDvrDi7VUNMtDkMj1txmmGkv7fyVGOKWyp+Xd5GwFZSa3yu5QhRrwpkD4BTD6HbjKah+BvWBN+6m9160Kog==
+tocbot@^4.18.2:
+  version "4.18.2"
+  resolved "https://registry.yarnpkg.com/tocbot/-/tocbot-4.18.2.tgz#e98bb4120fae02f0e4a01d3acff03f3db2ba3ad9"
+  integrity sha512-bWUfEYQZ4oFgT+qZYvzlTgbsTmA645ApHbo1iRaOBUeFfy5IpctgAQQjCXbPZy+4RDZ1JJYlIBgoApZMzMaYog==
 
 toggle-selection@^1.0.6:
   version "1.0.6"
